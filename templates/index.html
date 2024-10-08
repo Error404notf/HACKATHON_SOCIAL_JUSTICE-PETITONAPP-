@@ -4,6 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Petition App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #petitionsList {
+            list-style: none;
+            padding: 0;
+        }
+        #petitionsList li {
+            background: #f8f8f8;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .delete-button {
+            background-color: #dc3545;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+    </style>
     <script>
         async function submitPetition(event) {
             event.preventDefault();
@@ -22,6 +95,7 @@
             alert(result.message || result.error);
             if (result.message) {
                 loadPetitions(); // Refresh the petitions list
+                document.getElementById('petitionForm').reset(); // Clear the form
             }
         }
 
@@ -36,6 +110,7 @@
                 listItem.textContent = `${petition.id}: ${petition.title}`;
                 
                 const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-button';
                 deleteButton.textContent = 'Delete';
                 deleteButton.onclick = () => deletePetition(petition.id);
                 
@@ -62,16 +137,19 @@
     </script>
 </head>
 <body>
-    <h1>Add a Petition</h1>
-    <form onsubmit="submitPetition(event)">
-        <label for="title">Title:</label>
-        <input type="text" id="title" required><br><br>
-        <label for="description">Description:</label>
-        <textarea id="description" required></textarea><br><br>
-        <button type="submit">Submit Petition</button>
-    </form>
+    <div class="container">
+        <h1>Petition App</h1>
+        <form id="petitionForm" onsubmit="submitPetition(event)">
+            <h2>Add a Petition</h2>
+            <label for="title">Title:</label>
+            <input type="text" id="title" required>
+            <label for="description">Description:</label>
+            <textarea id="description" required></textarea>
+            <button type="submit">Submit Petition</button>
+        </form>
 
-    <h2>Current Petitions</h2>
-    <ul id="petitionsList"></ul>
+        <h2>Current Petitions</h2>
+        <ul id="petitionsList"></ul>
+    </div>
 </body>
 </html>
