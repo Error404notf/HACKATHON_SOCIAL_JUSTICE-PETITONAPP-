@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petition App</title>
+    <script>
+        async function submitPetition(event) {
+            event.preventDefault();
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+
+            const response = await fetch('/petitions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title, description })
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+            if (result.message) {
+                loadPetitions(); // Refresh the petitions list
+            }
+        }
+
+        async function loadPetitions() {
+            const response = await fetch('/petitions');
+            const petitions = await response.json();
+            const petitionsList = document.getElementById('petitionsList');
+            petitionsList.innerHTML = ''; // Clear previous list
+
+            petitions.forEach(petition => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${petition.id}: ${petition.title}`;
+                
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.onclick = () => deletePetition(petition.id);
+                
+                listItem.appendChild(deleteButton);
+                petitionsList.appendChild(listItem);
+            });
+        }
+
+        async function deletePetition(id) {
+            const response = await fetch(`/petitions/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const result = await response.json();
+            alert(result.message || result.error);
+            loadPetitions(); // Refresh the petitions list
+        }
+
+        // Load petitions when the page is loaded
+        window.onload = loadPetitions;
+    </script>
+</head>
+<body>
+    <h1>Add a Petition</h1>
+    <form onsubmit="submitPetition(event)">
+        <label for="title">Title:</label>
+        <input type="text" id="title" required><br><br>
+        <label for="description">Description:</label>
+        <textarea id="description" required></textarea><br><br>
+        <button type="submit">Submit Petition</button>
+    </form>
+
+    <h2>Current Petitions</h2>
+    <ul id="petitionsList"></ul>
+</body>
+</html>

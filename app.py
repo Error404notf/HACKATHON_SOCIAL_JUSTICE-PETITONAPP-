@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import mysql.connector
 import os
 from dotenv import load_dotenv
@@ -22,7 +22,8 @@ def get_db_connection():
 
 @app.route('/')
 def home():
-    return "Welcome to the Petition App!"
+    return render_template('index.html')
+
 @app.route('/petitions', methods=['GET'])
 def get_petitions():
     db = get_db_connection()
@@ -57,6 +58,27 @@ def add_petition():
         cursor.execute('INSERT INTO petitions (title, description) VALUES (%s, %s)', (title, description))
         db.commit()
         return jsonify({'message': 'Petition added successfully!'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        cursor.close()
+        db.close()
+
+@app.route('/petitions/<int:id>', methods=['DELETE'])
+def delete_petition(id):
+    db = get_db_connection()
+    if db is None:
+        return jsonify({'error': 'Database connection failed'}), 500
+
+    try:
+        cursor = db.cursor()
+        cursor.execute('DELETE FROM petitions WHERE id = %s', (id,))
+        db.commit()
+        
+        if cursor.rowcount == 0:
+            return jsonify({'error': 'Petition not found!'}), 404
+        
+        return jsonify({'message': 'Petition deleted successfully!'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     finally:
